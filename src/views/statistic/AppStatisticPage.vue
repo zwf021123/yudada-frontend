@@ -22,10 +22,10 @@
 import { computed, ref, watchEffect } from "vue";
 import API from "@/api";
 import message from "@arco-design/web-vue/es/message";
-import {
-  getAppAnswerCountUsingGet,
-  getAppAnswerResultCountUsingGet,
-} from "@/api/appStatisticController";
+// import {
+//   getAppAnswerCountUsingGet,
+//   getAppAnswerResultCountUsingGet,
+// } from "@/api/appStatisticController";
 import VChart from "vue-echarts";
 import "echarts";
 

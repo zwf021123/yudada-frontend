@@ -32,7 +32,7 @@
 import { ref, watchEffect } from "vue";
 import AppCard from "@/components/AppCard.vue";
 import API from "@/api";
-import { listAppVoByPageUsingPost } from "@/api/appController";
+import { listIndexAppUsingPost } from "@/api/appController";
 import message from "@arco-design/web-vue/es/message";
 import { REVIEW_STATUS_ENUM } from "@/constant/app";
 
@@ -53,16 +53,16 @@ const total = ref<number>(0);
  */
 const loadData = async () => {
   const params = {
-    reviewStatus: REVIEW_STATUS_ENUM.PASS,
+    // reviewStatus: [REVIEW_STATUS_ENUM.PASS],
     ...searchParams.value,
   };
-  const res = await listAppVoByPageUsingPost(params);
-  if (res.data.code === 0) {
-    dataList.value = res.data.data?.records || [];
-    total.value = res.data.data?.total || 0;
-  } else {
-    message.error("获取数据失败，" + res.data.message);
-  }
+  // const res = await listIndexAppUsingPost(params);
+  // if (res.data.code === 0) {
+  //   dataList.value = res.data.data?.records || [];
+  //   total.value = res.data.data?.total || 0;
+  // } else {
+  //   message.error("获取数据失败，" + res.data.message);
+  // }
 };
 
 /**
@@ -89,8 +89,8 @@ watchEffect(() => {
 }
 
 .searchBar {
-  text-align: center;
   margin-bottom: 28px;
+  text-align: center;
 }
 
 .list-demo-action-layout .image-area {

@@ -13,7 +13,7 @@
         >
           <div class="titleBar">
             <img class="logo" src="../assets/logo.png" />
-            <div class="title">鱼答答</div>
+            <div class="title">德答答</div>
           </div>
         </a-menu-item>
         <a-menu-item v-for="item in visibleRoutes" :key="item.path">
@@ -22,11 +22,12 @@
       </a-menu>
     </a-col>
     <a-col flex="100px">
+      {{ loginUserStore.loginUser }}
       <div v-if="loginUserStore.loginUser.id">
         {{ loginUserStore.loginUser.userName ?? "无名" }}
       </div>
       <div v-else>
-        <a-button type="primary" href="/user/login">登录</a-button>
+        <a-button type="primary" href="/user/login">登录/注册</a-button>
       </div>
     </a-col>
   </a-row>
