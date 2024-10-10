@@ -2,8 +2,10 @@
   <div id="addAppPage">
     <h2 style="margin-bottom: 32px">创建应用</h2>
     <a-form
+      ref="formRef"
       :model="form"
       :style="{ width: '480px' }"
+      :rules="formRules"
       label-align="left"
       auto-label-width
       @submit="handleSubmit"
@@ -15,14 +17,17 @@
         <a-input v-model="form.appDesc" placeholder="请输入应用描述" />
       </a-form-item>
       <a-form-item field="appIcon" label="应用图标">
-        <a-input v-model="form.appIcon" placeholder="请输入应用图标" />
+        <a-input
+          v-model="form.appIcon"
+          placeholder="请输入应用图标，未输入则使用默认图标"
+        />
       </a-form-item>
-      <!--      <a-form-item field="appIcon" label="应用图标">-->
-      <!--        <PictureUploader-->
-      <!--          :value="form.appIcon"-->
-      <!--          :onChange="(value) => (form.appIcon = value)"-->
-      <!--        />-->
-      <!--      </a-form-item>-->
+      <!-- <a-form-item field="appIcon" label="应用图标">
+        <PictureUploader
+          :value="form.appIcon"
+          :onChange="(value) => (form.appIcon = value)"
+        />
+      </a-form-item> -->
       <a-form-item field="appType" label="应用类型">
         <a-select
           v-model="form.appType"
@@ -31,6 +36,7 @@
         >
           <a-option
             v-for="(value, key) of APP_TYPE_MAP"
+            :key="key"
             :value="Number(key)"
             :label="value"
           />
@@ -44,6 +50,7 @@
         >
           <a-option
             v-for="(value, key) of APP_SCORING_STRATEGY_MAP"
+            :key="key"
             :value="Number(key)"
             :label="value"
           />
@@ -59,36 +66,52 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, watchEffect, withDefaults } from "vue";
+import { defineProps, Ref, ref, watchEffect, withDefaults } from "vue";
 import API from "@/api";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
 import {
-  addAppUsingPost,
-  editAppUsingPost,
-  getAppVoByIdUsingGet,
+  createAppUsingPost,
+  updateAppUsingPost,
+  detailAppUsingGet,
 } from "@/api/appController";
 import { APP_SCORING_STRATEGY_MAP, APP_TYPE_MAP } from "@/constant/app";
 
 interface Props {
-  id: string;
+  id: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  id: () => {
-    return "";
+  id: (val) => {
+    return Number(val);
   },
 });
 
 const router = useRouter();
 
+const formRef = ref();
 const form = ref({
   appDesc: "",
   appIcon: "",
   appName: "",
   appType: 0,
   scoringStrategy: 0,
-} as API.AppAddRequest);
+} as API.AppCreateRequest);
+
+const formRules = {
+  appName: [
+    {
+      required: true,
+      message: "应用名称是必要的",
+    },
+  ],
+  appDesc: [
+    {
+      required: true,
+      message: "应用描述是必要的",
+    },
+  ],
+};
 
 const oldApp = ref<API.AppVO>();
 
@@ -99,8 +122,8 @@ const loadData = async () => {
   if (!props.id) {
     return;
   }
-  const res = await getAppVoByIdUsingGet({
-    id: props.id as any,
+  const res = await detailAppUsingGet({
+    appId: props.id,
   });
   if (res.data.code === 0 && res.data.data) {
     oldApp.value = res.data.data;
@@ -119,24 +142,35 @@ watchEffect(() => {
  * 提交
  */
 const handleSubmit = async () => {
-  let res: any;
-  // 如果是修改
-  if (props.id) {
-    res = await editAppUsingPost({
-      id: props.id as any,
-      ...form.value,
-    });
-  } else {
-    // 创建
-    res = await addAppUsingPost(form.value);
+  // 校验表单
+  const validateValue = await formRef.value.validate();
+  if (validateValue) {
+    return;
   }
-  if (res.data.code === 0) {
-    message.success("操作成功，即将跳转到应用详情页");
-    setTimeout(() => {
-      router.push(`/app/detail/${props.id || res.data.data}`);
-    }, 3000);
-  } else {
-    message.error("操作失败，" + res.data.message);
+
+  // 如果没登录，跳转到登录页
+  let res: any;
+  try {
+    // 修改应用
+    if (props.id) {
+      res = await updateAppUsingPost({
+        id: props.id,
+        ...form.value,
+      });
+    } else {
+      // 创建应用
+      res = await createAppUsingPost(form.value);
+    }
+    if (res.data.code === 0) {
+      message.success("操作成功，即将跳转到应用详情页");
+      setTimeout(() => {
+        router.push(`/app/detail/${props.id || res.data.data}`);
+      }, 3000);
+    } else {
+      message.error("操作失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("获取数据失败，系统错误");
   }
 };
 </script>

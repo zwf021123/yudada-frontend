@@ -2,7 +2,7 @@ import axios from "axios";
 import { Message } from "@arco-design/web-vue";
 
 const myAxios = axios.create({
-  baseURL: "https://d31f-27-38-205-172.ngrok-free.app",
+  baseURL: "https://8730-163-125-205-180.ngrok-free.app",
   timeout: 60000,
   withCredentials: true,
 });
@@ -23,6 +23,8 @@ myAxios.interceptors.request.use(
 myAxios.interceptors.response.use(
   function (response) {
     console.log(response);
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
     const { data } = response;
 
     // 未登录
@@ -40,6 +42,8 @@ myAxios.interceptors.response.use(
     return response;
   },
   function (error) {
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
     return Promise.reject(error);
   }
 );

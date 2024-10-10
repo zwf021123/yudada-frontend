@@ -15,7 +15,6 @@ router.beforeEach(async (to, from, next) => {
     await loginUserStore.fetchLoginUser();
     loginUser = loginUserStore.loginUser;
   }
-
   // 当前页面需要的权限
   const needAccess = (to.meta?.access as string) ?? ACCESS_ENUM.NOT_LOGIN;
   // 要跳转的页面必须登录

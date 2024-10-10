@@ -29,6 +29,7 @@
         <a-input-password
           v-model="form.userPassword"
           placeholder="请输入密码"
+          @keyup.enter="handleSubmit"
         />
       </a-form-item>
       <a-form-item
@@ -41,6 +42,7 @@
         <a-input-password
           v-model="form.checkPassword"
           placeholder="请输入确认密码"
+          @keyup.enter="handleSubmit"
         />
       </a-form-item>
       <a-form-item>
@@ -54,9 +56,8 @@
         >
           <a-button
             type="primary"
-            html-type="submit"
             style="width: 120px"
-            @click="handleSubmit"
+            @click.prevent="handleSubmit"
           >
             {{ mode === "login" ? "登录" : "注册" }}
           </a-button>
@@ -146,26 +147,34 @@ const handleSubmit = async () => {
 };
 
 const loginFn = async () => {
-  const res = await userLoginUsingPost(form);
-  if (res.data.code === 0) {
-    await loginUserStore.fetchLoginUser();
-    message.success("登录成功");
-    router.push({
-      path: "/",
-      replace: true,
-    });
-  } else {
-    message.error("登录失败，" + res.data.message);
+  try {
+    const res = await userLoginUsingPost(form);
+    if (res.data.code === 0) {
+      await loginUserStore.fetchLoginUser();
+      message.success("登录成功");
+      router.push({
+        path: "/",
+        replace: true,
+      });
+    } else {
+      message.error("登录失败，" + res.data.message);
+    }
+  } catch (e) {
+    message.error("登录失败，" + e);
   }
 };
 
 const registerFn = async () => {
-  const res = await userRegisterUsingPost(form);
-  if (res.data.code === 0) {
-    message.success("注册成功");
-    mode.value = "login";
-  } else {
-    message.error("注册失败，" + res.data.message);
+  try {
+    const res = await userRegisterUsingPost(form);
+    if (res.data.code === 0) {
+      message.success("注册成功");
+      toggleMode();
+    } else {
+      message.error("注册失败，" + res.data.message);
+    }
+  } catch (e) {
+    message.error("注册失败，" + e);
   }
 };
 </script>

@@ -53,16 +53,20 @@ const total = ref<number>(0);
  */
 const loadData = async () => {
   const params = {
-    // reviewStatus: [REVIEW_STATUS_ENUM.PASS],
+    reviewStatus: [REVIEW_STATUS_ENUM.PASS],
     ...searchParams.value,
   };
-  // const res = await listIndexAppUsingPost(params);
-  // if (res.data.code === 0) {
-  //   dataList.value = res.data.data?.records || [];
-  //   total.value = res.data.data?.total || 0;
-  // } else {
-  //   message.error("获取数据失败，" + res.data.message);
-  // }
+  try {
+    const res = await listIndexAppUsingPost(params);
+    if (res.data.code === 0) {
+      dataList.value = res.data.data?.records || [];
+      total.value = res.data.data?.total || 0;
+    } else {
+      message.error("获取数据失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("获取数据失败，系统错误");
+  }
 };
 
 /**

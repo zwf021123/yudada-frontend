@@ -8,7 +8,7 @@ import ACCESS_ENUM from "@/access/accessEnum";
  */
 export const useLoginUserStore = defineStore("loginUser", () => {
   const loginUser = ref<API.LoginUserVO>({
-    userName: "未登录",
+    userName: "zwf",
   });
 
   function setLoginUser(newLoginUser: API.LoginUserVO) {

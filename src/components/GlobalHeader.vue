@@ -21,8 +21,25 @@
         </a-menu-item>
       </a-menu>
     </a-col>
+    {{ loginUserStore.loginUser }}
     <a-col flex="100px">
-      {{ loginUserStore.loginUser }}
+      <a-dropdown trigger="click">
+        <a-avatar :size="32" :style="{ marginRight: '8px', cursor: 'pointer' }">
+          <img alt="avatar" src="../assets/defaultAvatar.png" />
+        </a-avatar>
+        <template #content>
+          <a-doption>
+            <!-- <a-space @click="switchRoles"> -->
+            <a-space>
+              <icon-tag />
+              <span>
+                <!-- {{ $t("messageBox.switchRoles") }} -->
+                我的应用
+              </span>
+            </a-space>
+          </a-doption>
+        </template>
+      </a-dropdown>
       <div v-if="loginUserStore.loginUser.id">
         {{ loginUserStore.loginUser.userName ?? "无名" }}
       </div>
