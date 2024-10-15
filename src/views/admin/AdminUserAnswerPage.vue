@@ -76,8 +76,8 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
 import {
-  deleteUserAnswerUsingPost,
-  listUserAnswerByPageUsingPost,
+  deleteUserAnswerUsingGet,
+  listUserAnswerUsingPost,
 } from "@/api/userAnswerController";
 import API from "@/api";
 import message from "@arco-design/web-vue/es/message";
@@ -95,19 +95,23 @@ const initSearchParams = {
 const searchParams = ref<API.UserAnswerQueryRequest>({
   ...initSearchParams,
 });
-const dataList = ref<API.UserAnswer[]>([]);
+const dataList = ref<API.UserAnswerVO[]>([]);
 const total = ref<number>(0);
 
 /**
  * 加载数据
  */
 const loadData = async () => {
-  const res = await listUserAnswerByPageUsingPost(searchParams.value);
-  if (res.data.code === 0) {
-    dataList.value = res.data.data?.records || [];
-    total.value = res.data.data?.total || 0;
-  } else {
-    message.error("获取数据失败，" + res.data.message);
+  try {
+    const res = await listUserAnswerUsingPost(searchParams.value);
+    if (res.data.code === 0) {
+      dataList.value = res.data.data?.records || [];
+      total.value = res.data.data?.total || 0;
+    } else {
+      message.error("获取数据失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("获取数据失败，系统错误");
   }
 };
 
@@ -136,18 +140,21 @@ const onPageChange = (page: number) => {
  * 删除
  * @param record
  */
-const doDelete = async (record: API.UserAnswer) => {
+const doDelete = async (record: API.UserAnswerVO) => {
   if (!record.id) {
     return;
   }
-
-  const res = await deleteUserAnswerUsingPost({
-    id: record.id,
-  });
-  if (res.data.code === 0) {
-    loadData();
-  } else {
-    message.error("删除失败，" + res.data.message);
+  try {
+    const res = await deleteUserAnswerUsingGet({
+      userAnswerId: record.id,
+    });
+    if (res.data.code === 0) {
+      loadData();
+    } else {
+      message.error("删除失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("删除失败，系统错误");
   }
 };
 

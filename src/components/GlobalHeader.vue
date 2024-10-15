@@ -21,11 +21,17 @@
         </a-menu-item>
       </a-menu>
     </a-col>
-    {{ loginUserStore.loginUser }}
+    <!-- {{ loginUserStore.loginUser }} -->
     <a-col flex="100px">
       <a-dropdown trigger="click">
         <a-avatar :size="32" :style="{ marginRight: '8px', cursor: 'pointer' }">
-          <img alt="avatar" src="../assets/defaultAvatar.png" />
+          <img
+            alt="avatar"
+            :src="
+              loginUserStore.loginUser.userAvatar ||
+              require('@/assets/defaultAvatar.png')
+            "
+          />
         </a-avatar>
         <template #content>
           <a-doption>

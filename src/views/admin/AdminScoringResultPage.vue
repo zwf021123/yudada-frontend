@@ -70,8 +70,8 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
 import {
-  deleteScoringResultUsingPost,
-  listScoringResultByPageUsingPost,
+  deleteScoringResultUsingGet,
+  listScoringResultUsingPost,
 } from "@/api/scoringResultController";
 import API from "@/api";
 import message from "@arco-design/web-vue/es/message";
@@ -88,19 +88,23 @@ const initSearchParams = {
 const searchParams = ref<API.ScoringResultQueryRequest>({
   ...initSearchParams,
 });
-const dataList = ref<API.ScoringResult[]>([]);
+const dataList = ref<API.ScoringResultDetailVO[]>([]);
 const total = ref<number>(0);
 
 /**
  * 加载数据
  */
 const loadData = async () => {
-  const res = await listScoringResultByPageUsingPost(searchParams.value);
-  if (res.data.code === 0) {
-    dataList.value = res.data.data?.records || [];
-    total.value = res.data.data?.total || 0;
-  } else {
-    message.error("获取数据失败，" + res.data.message);
+  try {
+    const res = await listScoringResultUsingPost(searchParams.value);
+    if (res.data.code === 0) {
+      dataList.value = res.data.data?.records || [];
+      total.value = res.data.data?.total || 0;
+    } else {
+      message.error("获取数据失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("获取数据失败，系统错误");
   }
 };
 
@@ -129,18 +133,21 @@ const onPageChange = (page: number) => {
  * 删除
  * @param record
  */
-const doDelete = async (record: API.ScoringResult) => {
+const doDelete = async (record: API.ScoringResultDetailVO) => {
   if (!record.id) {
     return;
   }
-
-  const res = await deleteScoringResultUsingPost({
-    id: record.id,
-  });
-  if (res.data.code === 0) {
-    loadData();
-  } else {
-    message.error("删除失败，" + res.data.message);
+  try {
+    const res = await deleteScoringResultUsingGet({
+      scoringResultId: record.id,
+    });
+    if (res.data.code === 0) {
+      loadData();
+    } else {
+      message.error("删除失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("删除失败，系统错误");
   }
 };
 

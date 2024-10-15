@@ -6,28 +6,41 @@ import ACCESS_ENUM from "@/access/accessEnum";
 /**
  * 登录用户信息全局状态
  */
-export const useLoginUserStore = defineStore("loginUser", () => {
-  const loginUser = ref<API.LoginUserVO>({
-    userName: "zwf",
-  });
+export const useLoginUserStore = defineStore(
+  "loginUser",
+  () => {
+    const loginUser = ref<API.LoginUserVO>({
+      userName: "zwf",
+    });
+    const token = ref<string>("");
 
-  function setLoginUser(newLoginUser: API.LoginUserVO) {
-    loginUser.value = newLoginUser;
-  }
+    function setToken(newToken: string) {
+      token.value = newToken;
+    }
 
-  async function fetchLoginUser() {
-    try {
-      const res = await getLoginUserUsingGet();
-      if (res.data.code === 0 && res.data.data) {
-        loginUser.value = res.data.data;
-        console.log("登录成功", res, loginUser.value);
-      } else {
+    function setLoginUser(newLoginUser: API.LoginUserVO) {
+      loginUser.value = newLoginUser;
+    }
+
+    async function fetchLoginUser() {
+      try {
+        const res = await getLoginUserUsingGet();
+        if (res.data.code === 0 && res.data.data) {
+          loginUser.value = res.data.data;
+        } else {
+          loginUser.value = { userRole: ACCESS_ENUM.NOT_LOGIN };
+        }
+      } catch (error) {
         loginUser.value = { userRole: ACCESS_ENUM.NOT_LOGIN };
       }
-    } catch (error) {
-      loginUser.value = { userRole: ACCESS_ENUM.NOT_LOGIN };
     }
-  }
 
-  return { loginUser, setLoginUser, fetchLoginUser };
-});
+    return { loginUser, token, setToken, setLoginUser, fetchLoginUser };
+  },
+  {
+    persist: {
+      key: "qa-token",
+      pick: ["token"],
+    },
+  }
+);

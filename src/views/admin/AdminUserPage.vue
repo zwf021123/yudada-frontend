@@ -81,12 +81,16 @@ const total = ref<number>(0);
  * 加载数据
  */
 const loadData = async () => {
-  const res = await listUserByPageUsingPost(searchParams.value);
-  if (res.data.code === 0) {
-    dataList.value = res.data.data?.records || [];
-    total.value = res.data.data?.total || 0;
-  } else {
-    message.error("获取数据失败，" + res.data.message);
+  try {
+    const res = await listUserByPageUsingPost(searchParams.value);
+    if (res.data.code === 0) {
+      dataList.value = res.data.data?.records || [];
+      total.value = res.data.data?.total || 0;
+    } else {
+      message.error("获取数据失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("获取数据失败，系统错误");
   }
 };
 
@@ -120,13 +124,17 @@ const doDelete = async (record: API.User) => {
     return;
   }
 
-  const res = await deleteUserUsingPost({
-    id: record.id,
-  });
-  if (res.data.code === 0) {
-    loadData();
-  } else {
-    message.error("删除失败，" + res.data.message);
+  try {
+    const res = await deleteUserUsingPost({
+      id: record.id,
+    });
+    if (res.data.code === 0) {
+      loadData();
+    } else {
+      message.error("删除失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("删除失败，系统错误");
   }
 };
 

@@ -148,9 +148,11 @@ const handleSubmit = async () => {
 
 const loginFn = async () => {
   try {
+    delete form.checkPassword;
     const res = await userLoginUsingPost(form);
     if (res.data.code === 0) {
-      await loginUserStore.fetchLoginUser();
+      const token = (res.data.data as string) || "";
+      loginUserStore.setToken(token);
       message.success("登录成功");
       router.push({
         path: "/",

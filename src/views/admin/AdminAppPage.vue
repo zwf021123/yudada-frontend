@@ -85,9 +85,9 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
 import {
-  deleteAppUsingPost,
-  doAppReviewUsingPost,
-  listAppByPageUsingPost,
+  deleteAppUsingGet,
+  reviewAppUsingPost,
+  listAppUsingPost,
 } from "@/api/appController";
 import API from "@/api";
 import message from "@arco-design/web-vue/es/message";
@@ -110,19 +110,23 @@ const initSearchParams = {
 const searchParams = ref<API.AppQueryRequest>({
   ...initSearchParams,
 });
-const dataList = ref<API.App[]>([]);
+const dataList = ref<API.AppVO[]>([]);
 const total = ref<number>(0);
 
 /**
  * 加载数据
  */
 const loadData = async () => {
-  const res = await listAppByPageUsingPost(searchParams.value);
-  if (res.data.code === 0) {
-    dataList.value = res.data.data?.records || [];
-    total.value = res.data.data?.total || 0;
-  } else {
-    message.error("获取数据失败，" + res.data.message);
+  try {
+    const res = await listAppUsingPost(searchParams.value);
+    if (res.data.code === 0) {
+      dataList.value = res.data.data?.records || [];
+      total.value = res.data.data?.total || 0;
+    } else {
+      message.error("获取数据失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("获取数据失败，系统错误");
   }
 };
 
@@ -151,18 +155,22 @@ const onPageChange = (page: number) => {
  * 删除
  * @param record
  */
-const doDelete = async (record: API.App) => {
+const doDelete = async (record: API.AppVO) => {
   if (!record.id) {
     return;
   }
 
-  const res = await deleteAppUsingPost({
-    id: record.id,
-  });
-  if (res.data.code === 0) {
-    loadData();
-  } else {
-    message.error("删除失败，" + res.data.message);
+  try {
+    const res = await deleteAppUsingGet({
+      appId: record.id,
+    });
+    if (res.data.code === 0) {
+      loadData();
+    } else {
+      message.error("删除失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("删除失败，系统错误");
   }
 };
 
@@ -173,7 +181,7 @@ const doDelete = async (record: API.App) => {
  * @param reviewMessage
  */
 const doReview = async (
-  record: API.App,
+  record: API.AppVO,
   reviewStatus: number,
   reviewMessage?: string
 ) => {
@@ -181,15 +189,19 @@ const doReview = async (
     return;
   }
 
-  const res = await doAppReviewUsingPost({
-    id: record.id,
-    reviewStatus,
-    reviewMessage,
-  });
-  if (res.data.code === 0) {
-    loadData();
-  } else {
-    message.error("审核失败，" + res.data.message);
+  try {
+    const res = await reviewAppUsingPost({
+      id: record.id,
+      reviewStatus,
+      reviewMessage,
+    });
+    if (res.data.code === 0) {
+      loadData();
+    } else {
+      message.error("审核失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("审核失败，系统错误");
   }
 };
 
