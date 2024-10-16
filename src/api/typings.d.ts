@@ -16,7 +16,7 @@ declare namespace API {
   type AppDetailVO = {
     appIcon?: string;
     appName?: string;
-    appType?: number;
+    appType: number;
     appTypeName?: string;
     createTime?: string;
     createUser?: string;
@@ -26,7 +26,7 @@ declare namespace API {
     reviewStatusName?: string;
     reviewTime?: string;
     reviewer?: string;
-    scoringStrategy?: number;
+    scoringStrategy: number;
     scoringStrategyName?: string;
   };
 
@@ -171,6 +171,11 @@ declare namespace API {
   type deleteQuestionUsingGETParams = {
     /** questionId */
     questionId: number;
+  };
+
+  type listQuestionUsingGetParams = {
+    /** appId */
+    appId: string;
   };
 
   type DeleteRequest = {

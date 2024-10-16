@@ -4,20 +4,21 @@
       <a-row style="margin-bottom: 16px">
         <a-col flex="auto" class="content-wrapper">
           <h2>{{ data.appName }}</h2>
-          <p>{{ data.appDesc }}</p>
+          <!-- <p>{{ data.appDesc }}</p> -->
           <p>应用类型：{{ APP_TYPE_MAP[data.appType] }}</p>
           <p>评分策略：{{ APP_SCORING_STRATEGY_MAP[data.scoringStrategy] }}</p>
           <p>
             <a-space>
               作者：
               <div :style="{ display: 'flex', alignItems: 'center' }">
+                <!-- 这里的用户头像应从后台拿————用户分享该应用的场景 -->
                 <a-avatar
                   :size="24"
-                  :image-url="data.user?.userAvatar"
+                  :image-url="false || require('@/assets/defaultAvatar.png')"
                   :style="{ marginRight: '8px' }"
                 />
                 <a-typography-text
-                  >{{ data.user?.userName ?? "无名" }}
+                  >{{ data.createUser ?? "无名" }}
                 </a-typography-text>
               </div>
             </a-space>
@@ -40,7 +41,11 @@
           </a-space>
         </a-col>
         <a-col flex="320px">
-          <a-image width="100%" :src="data.appIcon" />
+          <a-image
+            width="100%"
+            height="280"
+            :src="data.appIcon || require('@/assets/questionnaire.jpg')"
+          />
         </a-col>
       </a-row>
     </a-card>
@@ -51,9 +56,8 @@
 <script setup lang="ts">
 import { computed, defineProps, ref, watchEffect, withDefaults } from "vue";
 import API from "@/api";
-import { getAppVoByIdUsingGet } from "@/api/appController";
+import { detailAppUsingGet } from "@/api/appController";
 import message from "@arco-design/web-vue/es/message";
-import { useRouter } from "vue-router";
 import { dayjs } from "@arco-design/web-vue/es/_utils/date";
 import { useLoginUserStore } from "@/store/userStore";
 import { APP_SCORING_STRATEGY_MAP, APP_TYPE_MAP } from "@/constant/app";
@@ -69,16 +73,19 @@ const props = withDefaults(defineProps<Props>(), {
   },
 });
 
-const router = useRouter();
-
-const data = ref<API.AppVO>({});
+const data = ref<API.AppDetailVO>({
+  appType: 0,
+  appName: "",
+  scoringStrategy: 0,
+});
 
 // 获取登录用户
 const loginUserStore = useLoginUserStore();
-let loginUserId = loginUserStore.loginUser?.id;
-// 是否为本人创建
+// let loginUserId = loginUserStore.loginUser?.id;
+const loginUserName = loginUserStore.loginUser?.userName;
+// 是否为本人创建（本应匹配id）
 const isMy = computed(() => {
-  return loginUserId && loginUserId === data.value.userId;
+  return loginUserName && loginUserName === data.value.createUser;
 });
 
 /**
@@ -88,13 +95,17 @@ const loadData = async () => {
   if (!props.id) {
     return;
   }
-  const res = await getAppVoByIdUsingGet({
-    id: props.id as any,
-  });
-  if (res.data.code === 0) {
-    data.value = res.data.data as any;
-  } else {
-    message.error("获取数据失败，" + res.data.message);
+  try {
+    const res = await detailAppUsingGet({
+      appId: props.id as any,
+    });
+    if (res.data.code === 0) {
+      res.data.data && (data.value = res.data.data);
+    } else {
+      message.error("获取数据失败，" + res.data.message);
+    }
+  } catch (e) {
+    message.error("获取数据失败，系统错误");
   }
 };
 

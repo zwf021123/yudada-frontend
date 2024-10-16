@@ -110,7 +110,7 @@ import { useRouter } from "vue-router";
 import {
   addQuestionUsingPost,
   editQuestionUsingPost,
-  listQuestionVoByPageUsingPost,
+  listQuestionUsingGet,
 } from "@/api/questionController";
 import message from "@arco-design/web-vue/es/message";
 import AiGenerateQuestionDrawer from "@/views/add/components/AiGenerateQuestionDrawer.vue";
@@ -128,7 +128,7 @@ const props = withDefaults(defineProps<Props>(), {
 const router = useRouter();
 
 // 题目内容结构（理解为题目列表）
-const questionContent = ref<API.QuestionContentDTO[]>([]);
+const questionContent = ref<API.QuestionContent[]>([]);
 
 /**
  * 添加题目
@@ -154,7 +154,7 @@ const deleteQuestion = (index: number) => {
  * @param question
  * @param index
  */
-const addQuestionOption = (question: API.QuestionContentDTO, index: number) => {
+const addQuestionOption = (question: API.QuestionContent, index: number) => {
   if (!question.options) {
     question.options = [];
   }
@@ -169,10 +169,7 @@ const addQuestionOption = (question: API.QuestionContentDTO, index: number) => {
  * @param question
  * @param index
  */
-const deleteQuestionOption = (
-  question: API.QuestionContentDTO,
-  index: number
-) => {
+const deleteQuestionOption = (question: API.QuestionContent, index: number) => {
   if (!question.options) {
     question.options = [];
   }
@@ -188,20 +185,20 @@ const loadData = async () => {
   if (!props.appId) {
     return;
   }
-  const res = await listQuestionVoByPageUsingPost({
-    appId: props.appId as any,
-    current: 1,
-    pageSize: 1,
-    sortField: "createTime",
-    sortOrder: "descend",
-  });
-  if (res.data.code === 0 && res.data.data?.records) {
-    oldQuestion.value = res.data.data?.records[0];
-    if (oldQuestion.value) {
-      questionContent.value = oldQuestion.value.questionContent ?? [];
+  try {
+    const res = await listQuestionUsingGet({
+      appId: props.appId as string,
+    });
+    if (res.data.code === 0) {
+      oldQuestion.value = res.data.data;
+      if (oldQuestion.value) {
+        questionContent.value = oldQuestion.value.questionContent ?? [];
+      }
+    } else {
+      message.error("获取数据失败，" + res.data.message);
     }
-  } else {
-    message.error("获取数据失败，" + res.data.message);
+  } catch (error) {
+    message.error("获取数据失败，系统错误");
   }
 };
 
@@ -217,34 +214,44 @@ const handleSubmit = async () => {
   if (!props.appId || !questionContent.value) {
     return;
   }
-  let res: any;
-  // 如果是修改
-  if (oldQuestion.value?.id) {
-    res = await editQuestionUsingPost({
-      id: oldQuestion.value.id,
-      questionContent: questionContent.value,
-    });
-  } else {
-    // 创建
-    res = await addQuestionUsingPost({
-      appId: props.appId as any,
-      questionContent: questionContent.value,
-    });
+  if (questionContent.value.length === 0) {
+    message.warning("题目不能为空");
+    return;
   }
-  if (res.data.code === 0) {
-    message.success("操作成功，即将跳转到应用详情页");
-    setTimeout(() => {
-      router.push(`/app/detail/${props.appId}`);
-    }, 3000);
-  } else {
-    message.error("操作失败，" + res.data.message);
+  let res: any;
+  try {
+    // 如果是修改
+    console.log(oldQuestion.value);
+
+    if (oldQuestion.value?.id) {
+      res = await editQuestionUsingPost({
+        id: oldQuestion.value.id,
+        questionContents: questionContent.value,
+      });
+    } else {
+      // 创建
+      res = await addQuestionUsingPost({
+        appId: props.appId as any,
+        questionContents: questionContent.value,
+      });
+    }
+    if (res.data.code === 0) {
+      message.success("操作成功，即将跳转到应用详情页");
+      setTimeout(() => {
+        router.push(`/app/detail/${props.appId}`);
+      }, 3000);
+    } else {
+      message.error("操作失败，" + res.data.message);
+    }
+  } catch (e) {
+    message.error(e.response.data.message || "提交失败，系统错误");
   }
 };
 
 /**
  * AI 生成题目成功后执行
  */
-const onAiGenerateSuccess = (result: API.QuestionContentDTO[]) => {
+const onAiGenerateSuccess = (result: API.QuestionContent[]) => {
   message.success(`AI 生成题目成功，生成 ${result.length} 道题目`);
   questionContent.value = [...questionContent.value, ...result];
 };
@@ -252,7 +259,7 @@ const onAiGenerateSuccess = (result: API.QuestionContentDTO[]) => {
 /**
  * AI 生成题目成功后执行（SSE）
  */
-const onAiGenerateSuccessSSE = (result: API.QuestionContentDTO) => {
+const onAiGenerateSuccessSSE = (result: API.QuestionContent) => {
   questionContent.value = [...questionContent.value, result];
 };
 

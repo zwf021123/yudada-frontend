@@ -148,7 +148,6 @@ const handleSubmit = async () => {
     return;
   }
 
-  // 如果没登录，跳转到登录页
   let res: any;
   try {
     // 修改应用

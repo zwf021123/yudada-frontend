@@ -66,8 +66,8 @@ import message from "@arco-design/web-vue/es/message";
 
 interface Props {
   appId: string;
-  onSuccess?: (result: API.QuestionContentDTO[]) => void;
-  onSSESuccess?: (result: API.QuestionContentDTO) => void;
+  onSuccess?: (result: API.QuestionContent[]) => void;
+  onSSESuccess?: (result: API.QuestionContent) => void;
   onSSEStart?: (event: any) => void;
   onSSEClose?: (event: any) => void;
 }
@@ -105,20 +105,24 @@ const handleSubmit = async () => {
     return;
   }
   submitting.value = true;
-  const res = await aiGenerateQuestionUsingPost({
-    appId: props.appId as any,
-    ...form,
-  });
-  if (res.data.code === 0 && res.data.data.length > 0) {
-    if (props.onSuccess) {
-      props.onSuccess(res.data.data);
+  try {
+    const res = await aiGenerateQuestionUsingPost({
+      appId: props.appId as any,
+      ...form,
+    });
+    if (res.data.code === 0 && res.data.data.length > 0) {
+      if (props.onSuccess) {
+        props.onSuccess(res.data.data);
+      } else {
+        message.success("生成题目成功");
+      }
+      // 关闭抽屉
+      handleCancel();
     } else {
-      message.success("生成题目成功");
+      message.error("操作失败，" + res.data.message);
     }
-    // 关闭抽屉
-    handleCancel();
-  } else {
-    message.error("操作失败，" + res.data.message);
+  } catch (error) {
+    message.error(error.response.data.message || "操作失败，系统错误");
   }
   submitting.value = false;
 };

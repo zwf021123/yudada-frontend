@@ -2,7 +2,7 @@
   <div id="doAnswerPage">
     <a-card>
       <h1>{{ app.appName }}</h1>
-      <p>{{ app.appDesc }}</p>
+      <!-- <p>{{ app.appDesc }}</p> -->
       <h2 style="margin-bottom: 16px">
         {{ current }}、{{ currentQuestion?.title }}
       </h2>
@@ -55,13 +55,13 @@ import {
 } from "vue";
 import API from "@/api";
 import { useRouter } from "vue-router";
-import { listQuestionVoByPageUsingPost } from "@/api/questionController";
-import message from "@arco-design/web-vue/es/message";
-import { getAppVoByIdUsingGet } from "@/api/appController";
 import {
-  addUserAnswerUsingPost,
-  generateUserAnswerIdUsingGet,
-} from "@/api/userAnswerController";
+  listQuestionUsingGet,
+  aiGenerateQuestionUsingPost,
+} from "@/api/questionController";
+import { detailAppUsingGet } from "@/api/appController";
+import message from "@arco-design/web-vue/es/message";
+import { addUserAnswerUsingPost } from "@/api/userAnswerController";
 
 interface Props {
   appId: string;
@@ -106,7 +106,7 @@ const id = ref<number>();
 
 // 生成唯一 id
 const generateId = async () => {
-  const res = await generateUserAnswerIdUsingGet();
+  const res = await aiGenerateQuestionUsingPost();
   if (res.data.code === 0) {
     id.value = res.data.data as any;
   } else {
@@ -126,27 +126,27 @@ const loadData = async () => {
   if (!props.appId) {
     return;
   }
-  // 获取 app
-  let res: any = await getAppVoByIdUsingGet({
-    id: props.appId as any,
-  });
-  if (res.data.code === 0) {
-    app.value = res.data.data as any;
-  } else {
-    message.error("获取应用失败，" + res.data.message);
-  }
-  // 获取题目
-  res = await listQuestionVoByPageUsingPost({
-    appId: props.appId as any,
-    current: 1,
-    pageSize: 1,
-    sortField: "createTime",
-    sortOrder: "descend",
-  });
-  if (res.data.code === 0 && res.data.data?.records) {
-    questionContent.value = res.data.data.records[0].questionContent;
-  } else {
-    message.error("获取题目失败，" + res.data.message);
+  try {
+    // 获取 app
+    let res: any = await detailAppUsingGet({
+      appId: props.appId as any,
+    });
+    if (res.data.code === 0) {
+      app.value = res.data.data as any;
+    } else {
+      message.error("获取应用失败，" + res.data.message);
+    }
+    // 获取题目
+    res = await listQuestionUsingGet({
+      appId: props.appId as string,
+    });
+    if (res.data.code === 0 && res.data.data?.questionContent) {
+      questionContent.value = res.data.data.questionContent;
+    } else {
+      message.error("获取题目失败，" + res.data.message);
+    }
+  } catch (e) {
+    message.error("获取数据失败，系统错误");
   }
 };
 
