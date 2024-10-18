@@ -214,8 +214,27 @@ const handleSubmit = async () => {
   if (!props.appId || !questionContent.value) {
     return;
   }
+  // 校验题目非空
   if (questionContent.value.length === 0) {
     message.warning("题目不能为空");
+    return;
+  }
+  // 校验题目内容非空
+  if (questionContent.value.some((item) => !item.title)) {
+    message.warning("题目内容不能为空");
+    return;
+  }
+
+  // 校验选项内容非空
+  if (
+    questionContent.value.some((item) => {
+      if (!item.options || item.options.length === 0) {
+        return true;
+      }
+      return item.options.some((option) => !option.key || !option.value);
+    })
+  ) {
+    message.warning("选项内容不能为空");
     return;
   }
   let res: any;
