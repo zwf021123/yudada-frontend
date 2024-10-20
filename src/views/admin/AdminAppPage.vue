@@ -28,6 +28,12 @@
   <a-table
     :columns="columns"
     :data="dataList"
+    :loading="tableLoading"
+    column-resizable
+    :bordered="{ cell: true }"
+    :scroll="{
+      x: 1400,
+    }"
     :pagination="{
       showTotal: true,
       pageSize: searchParams.pageSize,
@@ -65,6 +71,7 @@
         <a-button
           v-if="record.reviewStatus !== REVIEW_STATUS_ENUM.PASS"
           status="success"
+          size="mini"
           @click="doReview(record, REVIEW_STATUS_ENUM.PASS, '')"
         >
           通过
@@ -72,11 +79,14 @@
         <a-button
           v-if="record.reviewStatus !== REVIEW_STATUS_ENUM.REJECT"
           status="warning"
+          size="mini"
           @click="doReview(record, REVIEW_STATUS_ENUM.REJECT, '不符合上架要求')"
         >
           拒绝
         </a-button>
-        <a-button status="danger" @click="doDelete(record)">删除</a-button>
+        <a-button status="danger" size="mini" @click="doDelete(record)"
+          >删除</a-button
+        >
       </a-space>
     </template>
   </a-table>
@@ -112,12 +122,14 @@ const searchParams = ref<API.AppQueryRequest>({
 });
 const dataList = ref<API.AppVO[]>([]);
 const total = ref<number>(0);
+const tableLoading = ref<boolean>(false);
 
 /**
  * 加载数据
  */
 const loadData = async () => {
   try {
+    tableLoading.value = true;
     const res = await listAppUsingPost(searchParams.value);
     if (res.data.code === 0) {
       dataList.value = res.data.data?.records || [];
@@ -127,6 +139,8 @@ const loadData = async () => {
     }
   } catch (error) {
     message.error("获取数据失败，系统错误");
+  } finally {
+    tableLoading.value = false;
   }
 };
 
@@ -217,65 +231,87 @@ const columns = [
   {
     title: "id",
     dataIndex: "id",
+    width: 80,
+    ellipsis: true,
+    tooltip: true,
   },
   {
     title: "名称",
     dataIndex: "appName",
+    width: 80,
   },
   {
     title: "描述",
     dataIndex: "appDesc",
+    width: 80,
   },
   {
     title: "图标",
     dataIndex: "appIcon",
     slotName: "appIcon",
+    width: 100,
+    align: "center",
   },
   {
     title: "应用类型",
     dataIndex: "appType",
     slotName: "appType",
+    width: 100,
   },
   {
     title: "评分策略",
     dataIndex: "scoringStrategy",
     slotName: "scoringStrategy",
+    width: 100,
   },
   {
     title: "审核状态",
     dataIndex: "reviewStatus",
     slotName: "reviewStatus",
+    width: 100,
   },
   {
     title: "审核信息",
     dataIndex: "reviewMessage",
+    width: 100,
   },
   {
     title: "审核时间",
     dataIndex: "reviewTime",
     slotName: "reviewTime",
+    width: 70,
   },
   {
     title: "审核人 id",
     dataIndex: "reviewerId",
+    width: 70,
   },
   {
     title: "用户 id",
+
     dataIndex: "userId",
+    width: 70,
   },
   {
     title: "创建时间",
     dataIndex: "createTime",
     slotName: "createTime",
+    ellipsis: true,
+    tooltip: true,
+    width: 100,
   },
   {
     title: "更新时间",
     dataIndex: "updateTime",
     slotName: "updateTime",
+    ellipsis: true,
+    tooltip: true,
   },
   {
     title: "操作",
     slotName: "optional",
+    width: 200,
+    fixed: "right",
   },
 ];
 </script>

@@ -45,11 +45,11 @@
               {{ submitting ? "生成中" : "一键生成" }}
             </a-button>
             <a-button
-              :loading="sseSubmitting"
+              :loading="submitting"
               style="width: 120px"
               @click="handleSSESubmit"
             >
-              {{ sseSubmitting ? "生成中" : "实时生成" }}
+              {{ submitting ? "生成中" : "实时生成" }}
             </a-button>
           </a-space>
         </a-form-item>
@@ -85,7 +85,6 @@ const form = reactive({
 
 const visible = ref(false);
 const submitting = ref(false);
-const sseSubmitting = ref(false);
 
 const handleClick = () => {
   visible.value = true;
@@ -134,7 +133,7 @@ const handleSSESubmit = async () => {
   if (!props.appId) {
     return;
   }
-  sseSubmitting.value = true;
+  submitting.value = true;
   // 创建 SSE 请求
   const eventSource = new EventSource(
     // todo 手动填写完整的后端地址
@@ -161,6 +160,6 @@ const handleSSESubmit = async () => {
       eventSource.close();
     }
   };
-  sseSubmitting.value = false;
+  submitting.value = false;
 };
 </script>

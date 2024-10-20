@@ -28,6 +28,7 @@
   <a-table
     :columns="columns"
     :data="dataList"
+    :loading="tableLoading"
     :pagination="{
       showTotal: true,
       pageSize: searchParams.pageSize,
@@ -37,7 +38,10 @@
     @page-change="onPageChange"
   >
     <template #userAvatar="{ record }">
-      <a-image width="64" :src="record.userAvatar" />
+      <a-image
+        width="32"
+        :src="record.userAvatar || require('@/assets/defaultAvatar.png')"
+      />
     </template>
     <template #createTime="{ record }">
       {{ dayjs(record.createTime).format("YYYY-MM-DD HH:mm:ss") }}
@@ -76,12 +80,14 @@ const searchParams = ref<API.UserQueryRequest>({
 });
 const dataList = ref<API.User[]>([]);
 const total = ref<number>(0);
+const tableLoading = ref<boolean>(false);
 
 /**
  * 加载数据
  */
 const loadData = async () => {
   try {
+    tableLoading.value = true;
     const res = await listUserByPageUsingPost(searchParams.value);
     if (res.data.code === 0) {
       dataList.value = res.data.data?.records || [];
@@ -91,6 +97,8 @@ const loadData = async () => {
     }
   } catch (error) {
     message.error("获取数据失败，系统错误");
+  } finally {
+    tableLoading.value = false;
   }
 };
 

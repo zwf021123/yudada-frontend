@@ -114,6 +114,7 @@ export const routes: Array<RouteRecordRaw> = [
     name: "题目管理",
     component: AdminQuestionPage,
     meta: {
+      hideInMenu: true,
       access: ACCESS_ENUM.ADMIN,
     },
   },

@@ -23,34 +23,41 @@
     </a-col>
     <!-- {{ loginUserStore.loginUser }} -->
     <a-col flex="100px">
-      <a-dropdown trigger="click">
-        <a-avatar :size="32" :style="{ marginRight: '8px', cursor: 'pointer' }">
-          <img
-            alt="avatar"
-            :src="
-              loginUserStore.loginUser.userAvatar ||
-              require('@/assets/defaultAvatar.png')
-            "
-          />
-        </a-avatar>
-        <template #content>
-          <a-doption>
-            <!-- <a-space @click="switchRoles"> -->
-            <a-space>
-              <icon-tag />
-              <span>
-                <!-- {{ $t("messageBox.switchRoles") }} -->
-                我的应用
-              </span>
-            </a-space>
-          </a-doption>
-        </template>
-      </a-dropdown>
-      <div v-if="loginUserStore.loginUser.id">
-        {{ loginUserStore.loginUser.userName ?? "无名" }}
-      </div>
-      <div v-else>
-        <a-button type="primary" href="/user/login">登录/注册</a-button>
+      <div class="userInfo">
+        <a-dropdown trigger="click" v-if="loginUserStore.loginUser.id">
+          <a-avatar
+            :size="32"
+            :style="{ marginRight: '8px', cursor: 'pointer' }"
+          >
+            <img
+              alt="avatar"
+              :src="
+                loginUserStore.loginUser.userAvatar ||
+                require('@/assets/defaultAvatar.png')
+              "
+            />
+          </a-avatar>
+          <template #content>
+            <a-doption>
+              <!-- <a-space @click="switchRoles"> -->
+              <a-space>
+                <icon-tag />
+                <span>
+                  <!-- {{ $t("messageBox.switchRoles") }} -->
+                  我的应用
+                </span>
+              </a-space>
+            </a-doption>
+          </template>
+        </a-dropdown>
+        <div class="bottom">
+          <div v-if="loginUserStore.loginUser.id">
+            {{ loginUserStore.loginUser.userName ?? "无名" }}
+          </div>
+          <div v-else>
+            <a-button type="primary" href="/user/login">登录/注册</a-button>
+          </div>
+        </div>
       </div>
     </a-col>
   </a-row>
@@ -97,6 +104,16 @@ const doMenuClick = (key: string) => {
 
 <style scoped>
 #globalHeader {
+  .userInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    .bottom {
+      margin-top: 4px;
+    }
+  }
 }
 
 .titleBar {
