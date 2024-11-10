@@ -14,7 +14,7 @@
         <img
           :style="{ width: '100%', transform: 'translateY(-20px)' }"
           :alt="app.appName"
-          :src="app.appIcon"
+          :src="false || require('@/assets/questionnaire.jpg')"
         />
       </div>
     </template>
@@ -25,12 +25,10 @@
         >
           <a-avatar
             :size="24"
-            :image-url="app.user?.userAvatar"
+            :image-url="false || require('@/assets/defaultAvatar.png')"
             :style="{ marginRight: '8px' }"
           />
-          <a-typography-text
-            >{{ app.user?.userName ?? "无名" }}
-          </a-typography-text>
+          <a-typography-text>{{ app.createUser ?? "无名" }} </a-typography-text>
         </div>
       </template>
     </a-card-meta>

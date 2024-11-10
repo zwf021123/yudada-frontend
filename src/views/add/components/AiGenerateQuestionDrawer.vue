@@ -5,7 +5,11 @@
     :visible="visible"
     @ok="handleOk"
     @cancel="handleCancel"
-    unmountOnClose
+    :mask-closable="false"
+    :ok-button-props="{
+      disabled: submitting,
+    }"
+    :hide-cancel="true"
   >
     <template #title>AI 生成题目</template>
     <div>
@@ -24,6 +28,7 @@
             max="20"
             v-model="form.questionNumber"
             placeholder="请输入题目数量"
+            :disabled="submitting"
           />
         </a-form-item>
         <a-form-item field="optionNumber" label="选项数量">
@@ -32,19 +37,21 @@
             max="6"
             v-model="form.optionNumber"
             placeholder="请输入选项数量"
+            :disabled="submitting"
           />
         </a-form-item>
         <a-form-item>
           <a-space>
-            <a-button
+            <!-- <a-button
               :loading="submitting"
               type="primary"
               html-type="submit"
               style="width: 120px"
             >
               {{ submitting ? "生成中" : "一键生成" }}
-            </a-button>
+            </a-button> -->
             <a-button
+              type="primary"
               :loading="submitting"
               style="width: 120px"
               @click="handleSSESubmit"
@@ -61,7 +68,7 @@
 <script setup lang="ts">
 import { defineProps, reactive, ref, withDefaults } from "vue";
 import API from "@/api";
-import { aiGenerateQuestionUsingPost } from "@/api/questionController";
+import { aiGenerateQuestionUsingBySSEPost } from "@/api/questionController";
 import message from "@arco-design/web-vue/es/message";
 
 interface Props {
@@ -103,27 +110,28 @@ const handleSubmit = async () => {
   if (!props.appId) {
     return;
   }
-  submitting.value = true;
-  try {
-    const res = await aiGenerateQuestionUsingPost({
-      appId: props.appId as any,
-      ...form,
-    });
-    if (res.data.code === 0 && res.data.data.length > 0) {
-      if (props.onSuccess) {
-        props.onSuccess(res.data.data);
-      } else {
-        message.success("生成题目成功");
-      }
-      // 关闭抽屉
-      handleCancel();
-    } else {
-      message.error("操作失败，" + res.data.message);
-    }
-  } catch (error) {
-    message.error(error.response.data.message || "操作失败，系统错误");
-  }
-  submitting.value = false;
+  // submitting.value = true;
+  // try {
+  //   const res = await aiGenerateQuestionUsingBySSEPost({
+  //     appId: props.appId as any,
+  //     ...form,
+  //   });
+  //   if (res.status === 200 && res.data) {
+  //     if (props.onSuccess) {
+  //       props.onSuccess(res.data);
+  //     } else {
+  //       message.success("生成题目成功");
+  //     }
+  //     // 关闭抽屉
+  //     handleCancel();
+  //   } else {
+  //     message.error("操作失败，" + res.data.message);
+  //   }
+  // } catch (error) {
+  //   message.error(error.response.data.message || "操作失败，系统错误");
+  // }
+  // submitting.value = false;
+  handleCancel();
 };
 
 /**
@@ -137,7 +145,7 @@ const handleSSESubmit = async () => {
   // 创建 SSE 请求
   const eventSource = new EventSource(
     // todo 手动填写完整的后端地址
-    "http://localhost:8101/api/question/ai_generate/sse" +
+    "http://10.161.119.50:8080/aiaq/question/ai_generate/sse" +
       `?appId=${props.appId}&optionNumber=${form.optionNumber}&questionNumber=${form.questionNumber}`
   );
   let first = true;
@@ -145,7 +153,7 @@ const handleSSESubmit = async () => {
   eventSource.onmessage = function (event) {
     if (first) {
       props.onSSEStart?.(event);
-      handleCancel();
+      // handleCancel();
       first = !first;
     }
     props.onSSESuccess?.(JSON.parse(event.data));
@@ -156,10 +164,10 @@ const handleSSESubmit = async () => {
       console.log("关闭连接");
       props.onSSEClose?.(event);
       eventSource.close();
+      submitting.value = false;
     } else {
       eventSource.close();
     }
   };
-  submitting.value = false;
 };
 </script>

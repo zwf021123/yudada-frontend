@@ -58,7 +58,7 @@ import { useRouter } from "vue-router";
 import ScoringResultTable from "@/views/add/components/ScoringResultTable.vue";
 import {
   addScoringResultUsingPost,
-  editScoringResultUsingPost,
+  updateScoringResultUsingPost,
 } from "@/api/scoringResultController";
 import message from "@arco-design/web-vue/es/message";
 
@@ -97,23 +97,27 @@ const handleSubmit = async () => {
     return;
   }
   let res: any;
-  // 如果是修改
-  if (updateId.value) {
-    res = await editScoringResultUsingPost({
-      id: updateId.value as any,
-      ...form.value,
-    });
-  } else {
-    // 创建
-    res = await addScoringResultUsingPost({
-      appId: props.appId as any,
-      ...form.value,
-    });
-  }
-  if (res.data.code === 0) {
-    message.success("操作成功");
-  } else {
-    message.error("操作失败，" + res.data.message);
+  try {
+    // 如果是修改
+    if (updateId.value) {
+      res = await updateScoringResultUsingPost({
+        id: updateId.value as any,
+        ...form.value,
+      });
+    } else {
+      // 创建
+      res = await addScoringResultUsingPost({
+        appId: props.appId as any,
+        ...form.value,
+      });
+    }
+    if (res.data.code === 0) {
+      message.success("操作成功");
+    } else {
+      message.error("操作失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("操作失败，" + error.response.data.message);
   }
   if (tableRef.value) {
     tableRef.value.loadData();

@@ -17,7 +17,7 @@ import DoAnswerPage from "@/views/answer/DoAnswerPage.vue";
 import AnswerResultPage from "@/views/answer/AnswerResultPage.vue";
 import MyAnswerPage from "@/views/answer/MyAnswerPage.vue";
 import AppStatisticPage from "@/views/statistic/AppStatisticPage.vue";
-
+import UserAppPage from "@/views/user/UserAppPage.vue";
 export const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -167,6 +167,11 @@ export const routes: Array<RouteRecordRaw> = [
         path: "/user/login",
         name: "用户登录",
         component: UserLoginPage,
+      },
+      {
+        path: "/user/app",
+        name: "我的应用",
+        component: UserAppPage,
       },
     ],
     meta: {

@@ -28,6 +28,7 @@
   <a-table
     :columns="columns"
     :data="dataList"
+    :loading="tableLoading"
     :pagination="{
       showTotal: true,
       pageSize: searchParams.pageSize,
@@ -57,8 +58,8 @@
 <script setup lang="ts">
 import { defineExpose, defineProps, ref, watchEffect, withDefaults } from "vue";
 import {
-  deleteScoringResultUsingPost,
-  listScoringResultVoByPageUsingPost,
+  deleteScoringResultUsingGet,
+  listScoringResultUsingPost,
 } from "@/api/scoringResultController";
 import API from "@/api";
 import message from "@arco-design/web-vue/es/message";
@@ -90,6 +91,7 @@ const searchParams = ref<API.ScoringResultQueryRequest>({
 });
 const dataList = ref<API.ScoringResultVO[]>([]);
 const total = ref<number>(0);
+const tableLoading = ref(false);
 
 /**
  * 加载数据
@@ -98,16 +100,23 @@ const loadData = async () => {
   if (!props.appId) {
     return;
   }
-  const params = {
-    appId: props.appId as any,
-    ...searchParams.value,
-  };
-  const res = await listScoringResultVoByPageUsingPost(params);
-  if (res.data.code === 0) {
-    dataList.value = res.data.data?.records || [];
-    total.value = res.data.data?.total || 0;
-  } else {
-    message.error("获取数据失败，" + res.data.message);
+  try {
+    const params = {
+      appId: props.appId as any,
+      ...searchParams.value,
+    };
+    tableLoading.value = true;
+    const res = await listScoringResultUsingPost(params);
+    if (res.data.code === 0) {
+      dataList.value = res.data.data?.records || [];
+      total.value = res.data.data?.total || 0;
+    } else {
+      message.error("获取数据失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("获取数据失败，" + error.response.data.message);
+  } finally {
+    tableLoading.value = false;
   }
 };
 
@@ -115,7 +124,6 @@ const loadData = async () => {
 defineExpose({
   loadData,
 });
-
 
 /**
  * 执行搜索
@@ -142,18 +150,22 @@ const onPageChange = (page: number) => {
  * 删除
  * @param record
  */
-const doDelete = async (record: API.ScoringResult) => {
+const doDelete = async (record: API.ScoringResultDetailVO) => {
   if (!record.id) {
     return;
   }
 
-  const res = await deleteScoringResultUsingPost({
-    id: record.id,
-  });
-  if (res.data.code === 0) {
-    loadData();
-  } else {
-    message.error("删除失败，" + res.data.message);
+  try {
+    const res = await deleteScoringResultUsingGet({
+      scoringResultId: record.id,
+    });
+    if (res.data.code === 0) {
+      loadData();
+    } else {
+      message.error("删除失败，" + res.data.message);
+    }
+  } catch (error) {
+    message.error("删除失败，" + error.response.data.message);
   }
 };
 

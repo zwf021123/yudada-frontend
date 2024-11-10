@@ -38,7 +38,13 @@
             />
           </a-avatar>
           <template #content>
-            <a-doption>
+            <a-doption
+              @click="
+                $router.push({
+                  path: '/user/app',
+                })
+              "
+            >
               <!-- <a-space @click="switchRoles"> -->
               <a-space>
                 <icon-tag />
