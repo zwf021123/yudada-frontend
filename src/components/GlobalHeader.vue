@@ -41,7 +41,7 @@
             <a-doption
               @click="
                 $router.push({
-                  path: '/user/app',
+                  path: '/myapp',
                 })
               "
             >

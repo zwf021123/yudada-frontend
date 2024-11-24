@@ -398,6 +398,10 @@ declare namespace API {
 
   type UserAnswerVO = true;
 
+  type UserAnswerGetByIdRequest = {
+    userAnswerId: string;
+  };
+
   type UserLoginRequest = {
     userAccount?: string;
     userPassword?: string;

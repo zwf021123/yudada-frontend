@@ -74,7 +74,7 @@ const loadData = async () => {
     return;
   }
   const res = await getUserAnswerVoByIdUsingGet({
-    id: props.id as any,
+    userAnswerId: props.id as any,
   });
   if (res.data.code === 0) {
     data.value = res.data.data as any;

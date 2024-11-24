@@ -35,6 +35,7 @@
   <a-table
     :columns="columns"
     :data="dataList"
+    :loading="tableLoading"
     :pagination="{
       showTotal: true,
       pageSize: searchParams.pageSize,
@@ -90,12 +91,14 @@ const searchParams = ref<API.UserAnswerQueryRequest>({
 });
 const dataList = ref<API.UserAnswerVO[]>([]);
 const total = ref<number>(0);
+const tableLoading = ref<boolean>(false);
 
 /**
  * 加载数据
  */
 const loadData = async () => {
   try {
+    tableLoading.value = true;
     const res = await listUserAnswerUsingPost(searchParams.value);
     if (res.data.code === 0) {
       dataList.value = res.data.data?.records || [];
@@ -105,6 +108,8 @@ const loadData = async () => {
     }
   } catch (error) {
     message.error("获取数据失败，系统错误");
+  } finally {
+    tableLoading.value = false;
   }
 };
 

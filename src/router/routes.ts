@@ -18,6 +18,7 @@ import AnswerResultPage from "@/views/answer/AnswerResultPage.vue";
 import MyAnswerPage from "@/views/answer/MyAnswerPage.vue";
 import AppStatisticPage from "@/views/statistic/AppStatisticPage.vue";
 import UserAppPage from "@/views/user/UserAppPage.vue";
+
 export const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -86,6 +87,15 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/myapp",
+    name: "我的应用",
+    component: UserAppPage,
+    meta: {
+      hideInMenu: false,
+      access: ACCESS_ENUM.USER,
+    },
+  },
+  {
     path: "/answer/my",
     name: "我的答题",
     component: MyAnswerPage,
@@ -140,6 +150,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: AppStatisticPage,
     meta: {
       access: ACCESS_ENUM.ADMIN,
+      hideInMenu: true,
     },
   },
   {
@@ -158,6 +169,7 @@ export const routes: Array<RouteRecordRaw> = [
       hideInMenu: true,
     },
   },
+
   {
     path: "/user",
     name: "用户",
@@ -167,11 +179,6 @@ export const routes: Array<RouteRecordRaw> = [
         path: "/user/login",
         name: "用户登录",
         component: UserLoginPage,
-      },
-      {
-        path: "/user/app",
-        name: "我的应用",
-        component: UserAppPage,
       },
     ],
     meta: {

@@ -76,6 +76,7 @@ import API from "@/api";
 import {
   userLoginUsingPost,
   userRegisterUsingPost,
+  getLoginUserUsingGet,
 } from "@/api/userController";
 import { useLoginUserStore } from "@/store/userStore";
 import message from "@arco-design/web-vue/es/message";
@@ -154,6 +155,7 @@ const loginFn = async () => {
       const token = (res.data.data as string) || "";
       loginUserStore.setToken(token);
       message.success("登录成功");
+      await loginUserStore.fetchLoginUser();
       router.push({
         path: "/",
         replace: true,

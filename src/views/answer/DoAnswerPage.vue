@@ -106,7 +106,10 @@ const id = ref<number>();
 
 // 生成唯一 id
 const generateId = async () => {
-  const res = await aiGenerateQuestionUsingPost();
+  const params = {
+    appId: props.appId as any,
+  };
+  const res = await aiGenerateQuestionUsingPost(params);
   if (res.data.code === 0) {
     id.value = res.data.data as any;
   } else {
@@ -180,7 +183,7 @@ const doSubmit = async () => {
   const res = await addUserAnswerUsingPost({
     appId: props.appId as any,
     choices: answerList,
-    id: id.value as any,
+    // id: id.value as any,
   });
   if (res.data.code === 0 && res.data.data) {
     router.push(`/answer/result/${res.data.data}`);
