@@ -2,7 +2,7 @@ import axios from "axios";
 import { useLoginUserStore } from "@/store/userStore";
 
 const myAxios = axios.create({
-  baseURL: "http://10.161.119.50:8080",
+  baseURL: "https://487d-163-125-205-190.ngrok-free.app",
   timeout: 60000,
   withCredentials: false,
 });

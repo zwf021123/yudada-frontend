@@ -12,7 +12,7 @@
         allow-clear
       />
     </a-form-item>
-    <a-form-item field="appDesc" label="应用描述">
+    <a-form-item field="appDesc" label="应用描述" disabled>
       <a-input
         v-model="formSearchParams.appDesc"
         placeholder="请输入应用描述"

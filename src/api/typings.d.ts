@@ -394,6 +394,8 @@ declare namespace API {
     pageSize?: number;
     sortField?: string;
     sortOrder?: string;
+    resultName?: string;
+    resultDesc?: string;
   };
 
   type UserAnswerVO = true;

@@ -1,6 +1,15 @@
 <template>
   <div id="addQuestionPage">
-    <h2 style="margin-bottom: 32px">设置题目</h2>
+    <h2 class="title" style="margin-bottom: 32px">
+      设置题目
+      <a-tooltip
+        content="测评类请填写选项结果反之填写选项得分"
+        position="top"
+        mini
+      >
+        <icon-question-circle />
+      </a-tooltip>
+    </h2>
     <a-form
       :model="questionContent"
       :style="{ width: '480px' }"
@@ -298,3 +307,10 @@ const onSSEClose = (event: any) => {
   message.success("生成完毕");
 };
 </script>
+
+<style scoped>
+.addQuestionPage .title {
+  display: flex;
+  align-items: center;
+}
+</style>

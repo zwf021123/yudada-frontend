@@ -3,41 +3,56 @@
     :model="formSearchParams"
     :style="{ marginBottom: '20px' }"
     layout="inline"
+    disabled
     @submit="doSearch"
   >
-    <a-form-item field="resultName" label="结果名称">
-      <a-input
-        v-model="formSearchParams.resultName"
-        placeholder="请输入结果名称"
-        allow-clear
-      />
-    </a-form-item>
-    <a-form-item field="resultDesc" label="结果描述">
-      <a-input
-        v-model="formSearchParams.resultDesc"
-        placeholder="请输入结果描述"
-        allow-clear
-      />
-    </a-form-item>
-    <a-form-item field="appId" label="应用 id">
-      <a-input
-        v-model="formSearchParams.appId"
-        placeholder="请输入应用 id"
-        allow-clear
-      />
-    </a-form-item>
-    <a-form-item field="userId" label="用户 id">
-      <a-input
-        v-model="formSearchParams.userId"
-        placeholder="请输入用户 id"
-        allow-clear
-      />
-    </a-form-item>
-    <a-form-item>
-      <a-button type="primary" html-type="submit" style="width: 100px">
-        搜索
-      </a-button>
-    </a-form-item>
+    <a-row :gutter="16" justify="center" style="width: 100%">
+      <a-col :span="8">
+        <a-form-item field="resultName" label="结果名称">
+          <a-input
+            v-model="formSearchParams.resultName"
+            placeholder="请输入结果名称"
+            allow-clear
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="8">
+        <a-form-item field="resultDesc" label="结果描述">
+          <a-input
+            v-model="formSearchParams.resultDesc"
+            placeholder="请输入结果描述"
+            allow-clear
+          />
+        </a-form-item>
+      </a-col>
+    </a-row>
+    <a-row :gutter="16" justify="center" style="width: 100%">
+      <a-col :span="8">
+        <a-form-item field="appId" label="应用 id">
+          <a-input
+            v-model="formSearchParams.appId"
+            placeholder="请输入应用 id"
+            allow-clear
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="8">
+        <a-form-item field="userId" label="用户 id">
+          <a-input
+            v-model="formSearchParams.userId"
+            placeholder="请输入用户 id"
+            allow-clear
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="4">
+        <a-form-item>
+          <a-button type="primary" html-type="submit" style="width: 100px">
+            搜索
+          </a-button>
+        </a-form-item>
+      </a-col>
+    </a-row>
   </a-form>
   <a-table
     :columns="columns"

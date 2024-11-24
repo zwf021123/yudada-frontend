@@ -19,7 +19,7 @@
         allow-clear
       />
     </a-form-item>
-    <a-form-item field="appId" label="应用 id">
+    <a-form-item field="appId" label="应用 id" disabled>
       <a-input
         v-model="formSearchParams.appId"
         placeholder="请输入应用 id"

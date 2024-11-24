@@ -2,11 +2,14 @@
   <div id="homePage">
     <div class="searchBar">
       <a-input-search
+        v-model="searchParams.appName"
         :style="{ width: '320px' }"
         placeholder="快速发现答题应用"
         button-text="搜索"
         size="large"
         search-button
+        :loading="searchLoading"
+        @search="loadData"
       />
     </div>
     <a-list
@@ -48,6 +51,7 @@ const initSearchParams = {
 const searchParams = ref<API.AppQueryRequest>({
   ...initSearchParams,
 });
+const searchLoading = ref<boolean>(false);
 const dataList = ref<API.AppVO[]>([]);
 const total = ref<number>(0);
 
@@ -61,6 +65,7 @@ const loadData = async () => {
     ...searchParams.value,
   };
   try {
+    searchLoading.value = true;
     const res = await listIndexAppUsingPost(params);
     if (res.data.code === 0) {
       dataList.value = res.data.data?.records || [];
@@ -70,6 +75,8 @@ const loadData = async () => {
     }
   } catch (error) {
     message.error("获取数据失败，系统错误");
+  } finally {
+    searchLoading.value = false;
   }
 };
 
