@@ -145,7 +145,7 @@ const handleSSESubmit = async () => {
   // 创建 SSE 请求
   const eventSource = new EventSource(
     // todo 手动填写完整的后端地址
-    "http://10.161.119.50:8080/aiaq/question/ai_generate/sse" +
+    "http://127.0.0.1:8080/aiaq/question/ai_generate/sse" +
       `?appId=${props.appId}&optionNumber=${form.optionNumber}&questionNumber=${form.questionNumber}`
   );
   let first = true;
